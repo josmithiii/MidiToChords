@@ -1,0 +1,24 @@
+# Build directories
+build/
+Builds/
+cmake-build-*/
+
+# IDE files
+.idea/
+.vscode/
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+
+# macOS
+.DS_Store
+*.dSYM/
+
+# Generated files
+JuceLibraryCode/
