@@ -3,27 +3,29 @@
 BUILD_DIR := build
 CMAKE := cmake
 
-.PHONY: all debug release clean distclean rebuild help
+.PHONY: h help doc all d debug r release c clean dc distclean rb rebuild
+
+h help: doc
 
 all: release
 
-debug:
+d debug:
 	$(CMAKE) -B $(BUILD_DIR) -DCMAKE_BUILD_TYPE=Debug
 	$(CMAKE) --build $(BUILD_DIR)
 
-release:
+r release:
 	$(CMAKE) -B $(BUILD_DIR) -DCMAKE_BUILD_TYPE=Release
 	$(CMAKE) --build $(BUILD_DIR)
 
-clean:
+c clean:
 	$(CMAKE) --build $(BUILD_DIR) --target clean
 
-distclean:
+dc distclean:
 	rm -rf $(BUILD_DIR)
 
-rebuild: distclean release
+rb rebuild: distclean release
 
-help:
+doc:
 	@echo "Targets:"
 	@echo "  all       - Build release (default)"
 	@echo "  debug     - Configure and build debug"
