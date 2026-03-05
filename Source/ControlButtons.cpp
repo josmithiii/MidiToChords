@@ -60,12 +60,7 @@ ControlButtons::ControlButtons (juce::Rectangle<int> initialBounds, PluginEditor
 
   addAndMakeVisible (&chordLabel);
   chordLabel.setTooltip (TRANS("Chord Display"));
-  chordLabel.setText (TRANS("I am some chord"),
-                              juce::dontSendNotification);
-  addAndMakeVisible (&chordLabel);
-  chordLabel.setTooltip (TRANS("Chord Display"));
-  chordLabel.setText (TRANS("I am some chord name of arbitrary size and length"),
-                      juce::dontSendNotification);
+  chordLabel.setText (TRANS("---"), juce::dontSendNotification);
 
   addAndMakeVisible (&intervalsLabel);
   intervalsLabel.setTooltip (TRANS("Intervals"));

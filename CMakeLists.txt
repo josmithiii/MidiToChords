@@ -53,7 +53,6 @@ target_sources(${TARGET_NAME} PRIVATE
     Source/ControlButtons.cpp
     Source/PluginProcessor.cpp
     Source/PluginEditor.cpp
-    Source/PluginGUI.cpp
 )
 
 # Binary data (XML resource)

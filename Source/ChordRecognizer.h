@@ -11,15 +11,6 @@
 #include <vector>
 #include <string>
 
-/**
- * ChordRecognizer identifies chords from a set of pitch classes.
- *
- * Features:
- * - Comprehensive chord database (triads, 7ths, 9ths, 11ths, 13ths, altered, etc.)
- * - Automatic root detection (tries all 12 possible roots)
- * - Inversion detection with slash chord notation (e.g., C/E)
- * - Score-based matching for best fit
- */
 class ChordRecognizer
 {
 public:
@@ -27,7 +18,7 @@ public:
 
     struct ChordDefinition {
         std::string name;           // e.g., "", "m", "7", "maj7", "dim7"
-        std::vector<int> intervals; // semitones from root: {0, 4, 7} for major triad
+        std::vector<int> intervals; // semitones from root (0-11)
         int priority;               // higher = preferred when multiple match
     };
 
@@ -47,19 +38,12 @@ public:
     /**
      * Identify the chord from pitch classes present.
      * @param pitchClasses Array of 12 ints, non-zero means that pitch class is present
+     * @param lowestMidiNote The lowest MIDI note currently held (-1 if unknown)
      * @return ChordResult with identified chord info
      */
-    ChordResult identify(const PitchClassSet& pitchClasses) const;
+    ChordResult identify(const PitchClassSet& pitchClasses, int lowestMidiNote = -1) const;
 
-    /**
-     * Get the note name for a pitch class (0-11).
-     * Uses sharps for black keys by default.
-     */
     static juce::String pitchClassName(int pitchClass, bool preferFlats = false);
-
-    /**
-     * Get interval name for semitones from root.
-     */
     static juce::String intervalName(int semitones);
 
 private:
@@ -67,29 +51,14 @@ private:
 
     void initializeChordDatabase();
 
-    /**
-     * Try to match pitch classes with a specific root.
-     * Returns best matching chord definition and score.
-     */
     std::pair<const ChordDefinition*, float> matchWithRoot(
         const PitchClassSet& pitchClasses,
         int root) const;
 
-    /**
-     * Convert pitch class set to interval set relative to a root.
-     */
     std::vector<int> pitchClassesToIntervals(
         const PitchClassSet& pitchClasses,
         int root) const;
 
-    /**
-     * Find the lowest pitch class present (for bass note detection).
-     */
-    int findLowestPitchClass(const PitchClassSet& pitchClasses) const;
-
-    /**
-     * Calculate match score between intervals and chord definition.
-     */
     float calculateMatchScore(
         const std::vector<int>& intervals,
         const ChordDefinition& chord) const;

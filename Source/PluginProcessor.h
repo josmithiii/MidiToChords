@@ -10,17 +10,8 @@
 
 #include <JuceHeader.h>
 
-#define USE_PGM (0)
-
 //==============================================================================
-/**
- */
-class PluginProcessor  : public
-#if USE_PGM == 1
-foleys::MagicProcessor
-#else
-juce::AudioProcessor
-#endif
+class PluginProcessor  : public juce::AudioProcessor
 {
 public:
   //==============================================================================
@@ -38,13 +29,10 @@ public:
   void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
 
   //==============================================================================
-#if USE_PGM == 0
   juce::AudioProcessorEditor* createEditor() override;
   bool hasEditor() const override;
-  //==============================================================================
   void getStateInformation (juce::MemoryBlock& destData) override;
   void setStateInformation (const void* data, int sizeInBytes) override;
-#endif
 
   //==============================================================================
   const juce::String getName() const override;
@@ -62,9 +50,18 @@ public:
   void changeProgramName (int index, const juce::String& newName) override;
 
   //==============================================================================
-  // For our example:
   std::array<int,12> getPitchClassesPresent() {
+    const juce::SpinLock::ScopedLockType lock(pitchClassLock);
     return pitchClassesPresent;
+  }
+
+  /// Returns the lowest MIDI note number currently held, or -1 if none.
+  int getLowestHeldNote() {
+    const juce::SpinLock::ScopedLockType lock(pitchClassLock);
+    for (int i = 0; i < 128; i++)
+      if (heldNotes[i] > 0)
+        return i;
+    return -1;
   }
 
   juce::MidiKeyboardState& getMidiKeyboardState() {
@@ -73,10 +70,11 @@ public:
 
 private:
 
-  juce::String currentChord = "no Chord in Processor";
+  juce::SpinLock pitchClassLock;
   std::array<int,12> pitchClassesPresent { 0 };
+  std::array<int,128> heldNotes { 0 };
 
-  void updatePitchClassesPresent(int noteNumber);
+  void updateNoteState(int noteNumber, bool noteOn);
   juce::MidiKeyboardState midiKeyboardState;
   //==============================================================================
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)

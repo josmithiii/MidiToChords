@@ -44,15 +44,12 @@ MidiToChords is a JUCE-based AU/Standalone MIDI plugin that displays chord names
 - Root key selector combo box
 - Font size slider
 
-**PluginGUI** (`Source/PluginGUI.cpp/.h`)
-- Legacy/alternative GUI component (kept for reference, may not be active)
-
 ## Key Data Flow
 
 1. MIDI note on/off events arrive in `PluginProcessor::processBlock()`
-2. Processor updates `pitchClassesPresent[12]` array and `MidiKeyboardState`
-3. Editor's timer callback polls `getPitchClassesPresent()` on each frame
-4. Changed pitch classes trigger `ChordRecognizer::identify()`
+2. Processor updates `pitchClassesPresent[12]`, `heldNotes[128]`, and `MidiKeyboardState` (SpinLock-protected)
+3. Editor's timer callback polls `getPitchClassesPresent()` and `getLowestHeldNote()` on each frame
+4. Changed pitch classes trigger `ChordRecognizer::identify()` with actual bass note for accurate inversion detection
 5. Best-match chord result displayed in GUI labels
 
 ## Dependencies
