@@ -2,7 +2,7 @@
 
 A JUCE-based AU/Standalone MIDI plugin that displays chord names from MIDI input in real-time.
 
-<img src="screenshot.jpg" alt="MidiToChords screenshot" width="500">
+<img src="screenshot.png" alt="MidiToChords screenshot" width="500">
 
 ## Features
 
