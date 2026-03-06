@@ -20,5 +20,8 @@ compile_commands.json
 .DS_Store
 *.dSYM/
 
+# JUCE framework (supply your own copy or symlink)
+JUCE/
+
 # Generated files
 JuceLibraryCode/

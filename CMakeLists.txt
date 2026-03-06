@@ -21,7 +21,17 @@ if(APPLE)
     set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "Minimum macOS version")
 endif()
 
-# Add JUCE
+# Add JUCE — supply your own copy:
+#   git clone https://github.com/juce-framework/JUCE.git
+# or symlink to an existing checkout:
+#   ln -s /path/to/your/JUCE .
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/JUCE/CMakeLists.txt")
+    message(FATAL_ERROR
+        "JUCE not found. Clone it into this directory:\n"
+        "  git clone https://github.com/juce-framework/JUCE.git\n"
+        "or symlink an existing copy:\n"
+        "  ln -s /path/to/your/JUCE .")
+endif()
 add_subdirectory(JUCE)
 
 # Plugin target
