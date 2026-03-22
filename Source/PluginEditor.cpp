@@ -46,7 +46,8 @@ PluginEditor::PluginEditor (PluginProcessor& p) // xtor
   addAndMakeVisible(chordLabel);
   addAndMakeVisible(intervalsLabel);
   addAndMakeVisible(pitchClassesLabel);
-  midiKeyboardComponent.setLowestVisibleKey(/* "C0" really C2 */ 24);
+  midiKeyboardComponent.setOctaveForMiddleC(4);  // C4 = middle C (Yamaha/ASA convention)
+  midiKeyboardComponent.setLowestVisibleKey(24);
   addAndMakeVisible(midiKeyboardComponent);
   setResizable(/* allowHostToResize */ true, /* useBottomRightCornerResizer */ true);
 
@@ -58,6 +59,11 @@ PluginEditor::PluginEditor (PluginProcessor& p) // xtor
   // Restore saved UI state from processor
   controlButtons.loadFromState(audioProcessor.uiState);
 
+  // Restore window size
+  int savedW = audioProcessor.uiState.getProperty("windowWidth", 800);
+  int savedH = audioProcessor.uiState.getProperty("windowHeight", 500);
+  setSize(juce::jlimit(100, w, savedW), juce::jlimit(75, h, savedH));
+
   resized();
   startTimerHz (/* frameRateHz */ 10);
 }
@@ -65,6 +71,8 @@ PluginEditor::PluginEditor (PluginProcessor& p) // xtor
 PluginEditor::~PluginEditor()
 {
   controlButtons.saveToState(audioProcessor.uiState);
+  audioProcessor.uiState.setProperty("windowWidth", getWidth(), nullptr);
+  audioProcessor.uiState.setProperty("windowHeight", getHeight(), nullptr);
 }
 
 static int arrayCountNonzero(PitchClasses a) {
