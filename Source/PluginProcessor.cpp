@@ -162,10 +162,16 @@ juce::AudioProcessorEditor* PluginProcessor::createEditor()
 //==============================================================================
 void PluginProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
+  auto xml = uiState.createXml();
+  if (xml != nullptr)
+    copyXmlToBinary(*xml, destData);
 }
 
 void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
+  auto xml = getXmlFromBinary(data, sizeInBytes);
+  if (xml != nullptr && xml->hasTagName(uiState.getType().toString()))
+    uiState = juce::ValueTree::fromXml(*xml);
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -68,6 +68,9 @@ public:
     return midiKeyboardState;
   }
 
+  /// Persistent UI state — survives DAW save/load
+  juce::ValueTree uiState { "MidiToChordsState" };
+
 private:
 
   juce::SpinLock pitchClassLock;

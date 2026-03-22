@@ -54,12 +54,17 @@ PluginEditor::PluginEditor (PluginProcessor& p) // xtor
   int w = r.getWidth() - 30;
   int h = r.getHeight() - 50;
   setResizeLimits (100, 75, w, h);
+
+  // Restore saved UI state from processor
+  controlButtons.loadFromState(audioProcessor.uiState);
+
   resized();
   startTimerHz (/* frameRateHz */ 10);
 }
 
 PluginEditor::~PluginEditor()
 {
+  controlButtons.saveToState(audioProcessor.uiState);
 }
 
 static int arrayCountNonzero(PitchClasses a) {
@@ -250,6 +255,8 @@ void PluginEditor::paint (juce::Graphics& g)
 
 void PluginEditor::resized()
 {
+  controlButtons.saveToState(audioProcessor.uiState);
+
   juce::Grid grid;
   using Track = juce::Grid::TrackInfo;
   using Fr = juce::Grid::Fr;

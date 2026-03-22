@@ -23,6 +23,9 @@ public:
   juce::Label&  getPitchClassesLabel() { return pitchClassesLabel; }
   int getFontSize() { return fontSize; }
 
+  void saveToState(juce::ValueTree& state);
+  void loadFromState(const juce::ValueTree& state);
+
 private:
   PluginEditor* editor;
 

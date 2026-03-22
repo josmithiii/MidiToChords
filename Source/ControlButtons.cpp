@@ -130,3 +130,42 @@ void ControlButtons::rootKeyComboBoxChanged ()
   //!!! rootKeyLambda(rootKeyComboBox->getText());
   editor->setRootKey(rootKeyComboBox.getText());
 }
+
+void ControlButtons::saveToState(juce::ValueTree& state)
+{
+  state.setProperty("fontSize",         fontSize,        nullptr);
+  state.setProperty("showKeyboard",     showKeyboard,    nullptr);
+  state.setProperty("showPitchClasses", showPitchClasses, nullptr);
+  state.setProperty("showIntervals",    showIntervals,   nullptr);
+  state.setProperty("showChord",        showChord,       nullptr);
+  state.setProperty("rootKey",          rootKeyComboBox.getSelectedId(), nullptr);
+}
+
+void ControlButtons::loadFromState(const juce::ValueTree& state)
+{
+  if (state.hasProperty("fontSize")) {
+    fontSize = (int)state["fontSize"];
+    fontSizeSlider.setValue(fontSize, juce::dontSendNotification);
+  }
+  if (state.hasProperty("showKeyboard")) {
+    showKeyboard = (int)state["showKeyboard"];
+    showKeyboardButton.setToggleState(showKeyboard != 0, juce::dontSendNotification);
+  }
+  if (state.hasProperty("showPitchClasses")) {
+    showPitchClasses = (int)state["showPitchClasses"];
+    showPitchClassesButton.setToggleState(showPitchClasses != 0, juce::dontSendNotification);
+  }
+  if (state.hasProperty("showIntervals")) {
+    showIntervals = (int)state["showIntervals"];
+    showIntervalsButton.setToggleState(showIntervals != 0, juce::dontSendNotification);
+  }
+  if (state.hasProperty("showChord")) {
+    showChord = (int)state["showChord"];
+    showChordButton.setToggleState(showChord != 0, juce::dontSendNotification);
+  }
+  if (state.hasProperty("rootKey")) {
+    int rootId = (int)state["rootKey"];
+    if (rootId > 0)
+      rootKeyComboBox.setSelectedId(rootId, juce::dontSendNotification);
+  }
+}
