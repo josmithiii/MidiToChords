@@ -128,9 +128,11 @@ void PluginProcessor::updateNoteState(int noteNumber, bool noteOn)
 
   const juce::SpinLock::ScopedLockType lock(pitchClassLock);
   heldNotes[noteNumber] += inc;
-  jassert(heldNotes[noteNumber] >= 0);
+  if (heldNotes[noteNumber] < 0)
+    heldNotes[noteNumber] = 0;  // clamp: spurious note-offs must not go negative
   pitchClassesPresent[pc] += inc;
-  jassert(pitchClassesPresent[pc] >= 0);
+  if (pitchClassesPresent[pc] < 0)
+    pitchClassesPresent[pc] = 0;  // clamp: spurious note-offs must not go negative
 }
 
 void PluginProcessor::clearAllNotes()
@@ -180,8 +182,10 @@ void PluginProcessor::getStateInformation (juce::MemoryBlock& destData)
 void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
   auto xml = getXmlFromBinary(data, sizeInBytes);
-  if (xml != nullptr && xml->hasTagName(uiState.getType().toString()))
+  if (xml != nullptr && xml->hasTagName(uiState.getType().toString())) {
     uiState = juce::ValueTree::fromXml(*xml);
+    stateRestored.store(true);  // tell editor to re-read
+  }
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -71,6 +71,7 @@ PluginEditor::PluginEditor (PluginProcessor& p) // xtor
   setSize(juce::jlimit(100, w, savedW), juce::jlimit(75, h, savedH));
 
   resized();
+  initialized = true;
   startTimerHz (/* frameRateHz */ 10);
 }
 
@@ -157,6 +158,11 @@ void PluginEditor::setRootKey(juce::String key) {
     }
   }
   jassert(found);
+  // Force re-rotation and display update with the new root key
+  rotatePitchClassesPresent();
+  pitchClassesNew = true;
+  updateStrings();
+  repaint();
 }
 
 void PluginEditor::reset() {
@@ -172,6 +178,19 @@ void PluginEditor::reset() {
 //==============================================================================
 void PluginEditor::timerCallback()
 {
+  // DAW may call setStateInformation after editor is already open
+  if (audioProcessor.stateRestored.exchange(false)) {
+    controlButtons.loadFromState(audioProcessor.uiState);
+    if (audioProcessor.uiState.hasProperty("rootKey")) {
+      int rootId = (int)audioProcessor.uiState["rootKey"];
+      if (rootId > 0 && rootId <= keyNames.size())
+        currentKey = rootId - 1;
+    }
+    rotatePitchClassesPresent();
+    pitchClassesNew = true;
+    resized();
+  }
+
   const juce::GenericScopedTryLock<juce::CriticalSection> myScopedTryLock (resetLock);
   if (myScopedTryLock.isLocked()) {
     PitchClasses newPitchClassesPresent = audioProcessor.getPitchClassesPresent();
@@ -269,7 +288,10 @@ void PluginEditor::paint (juce::Graphics& g)
 
 void PluginEditor::resized()
 {
-  controlButtons.saveToState(audioProcessor.uiState);
+  // Save UI state to processor on every layout change (but not during construction,
+  // which would overwrite restored state before loadFromState reads it)
+  if (initialized)
+    controlButtons.saveToState(audioProcessor.uiState);
   audioProcessor.freezeNotes.store(controlButtons.getFreeze());
 
   juce::Grid grid;

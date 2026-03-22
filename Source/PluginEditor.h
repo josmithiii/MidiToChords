@@ -49,6 +49,7 @@ private:
   PitchClasses rotatedPitchClassesPresent { 0 };
   int lowestHeldNote = -1;
   bool pitchClassesNew = true; // triggers initial paint
+  bool initialized = false;    // set at end of constructor; guards saveToState in resized()
   long int frameCount = 0;
   int currentKey = 0; // C
   juce::StringArray keyNames { "C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B" };

@@ -77,6 +77,9 @@ public:
   /// Persistent UI state — survives DAW save/load
   juce::ValueTree uiState { "MidiToChordsState" };
 
+  /// Set by setStateInformation so the editor can re-read restored state.
+  std::atomic<bool> stateRestored { false };
+
 private:
 
   juce::SpinLock pitchClassLock;

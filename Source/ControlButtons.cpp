@@ -62,6 +62,8 @@ ControlButtons::ControlButtons (juce::Rectangle<int> initialBounds, PluginEditor
   rootKeyComboBox.addItem (TRANS("Ab"), 9);
   rootKeyComboBox.addItem (TRANS("A"), 10);
   rootKeyComboBox.addItem (TRANS("Bb"), 11);
+  rootKeyComboBox.addItem (TRANS("B"), 12);
+  rootKeyComboBox.setSelectedId(1, juce::dontSendNotification);  // default to C
   rootKeyComboBox.onChange = [this]() { rootKeyComboBoxChanged(); editor->resized(); DBG("Root key set to " << rootKeyComboBox.getText()); };
 
   addAndMakeVisible (&chordLabel);
