@@ -58,6 +58,12 @@ PluginEditor::PluginEditor (PluginProcessor& p) // xtor
 
   // Restore saved UI state from processor
   controlButtons.loadFromState(audioProcessor.uiState);
+  // Sync editor's currentKey from restored combo box selection
+  if (audioProcessor.uiState.hasProperty("rootKey")) {
+    int rootId = (int)audioProcessor.uiState["rootKey"];
+    if (rootId > 0 && rootId <= keyNames.size())
+      currentKey = rootId - 1;  // combo IDs are 1-based
+  }
 
   // Restore window size
   int savedW = audioProcessor.uiState.getProperty("windowWidth", 800);
