@@ -281,10 +281,18 @@ float ChordRecognizer::calculateMatchScore(
     if (matches == static_cast<int>(chordIntervals.size()) && extraNotes == 0)
         score += 0.2f;
 
+    // Tritone bonus: when the input contains a tritone (interval 6) from the root,
+    // prefer chord templates that include it — tritones are harmonically distinctive
+    // and should be "explained" by the chord name rather than ignored as extra notes.
+    bool inputHasTritone = std::find(intervals.begin(), intervals.end(), 6) != intervals.end();
+    bool chordHasTritone = std::find(chordIntervals.begin(), chordIntervals.end(), 6) != chordIntervals.end();
+    if (inputHasTritone && chordHasTritone)
+        score += 0.05f;
+
     // Add priority bonus (normalized)
     score += chord.priority * 0.001f;
 
-    return std::max(0.0f, std::min(1.0f, score));
+    return std::max(0.0f, score);
 }
 
 std::pair<const ChordRecognizer::ChordDefinition*, float>
