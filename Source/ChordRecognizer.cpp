@@ -345,6 +345,21 @@ ChordRecognizer::ChordResult ChordRecognizer::identify(const PitchClassSet& pitc
         result.bassPitchClass = pc;
         result.rootName = pitchClassName(pc);
         result.fullName = result.rootName;
+        // Append octave as Unicode subscript digits when MIDI note is known
+        if (lowestMidiNote >= 0) {
+            int octave = (lowestMidiNote / 12) - 1;  // JUCE convention: C4 = middle C = MIDI 60
+            static const juce::juce_wchar subscriptDigits[] = {
+                0x2080, 0x2081, 0x2082, 0x2083, 0x2084,  // ₀₁₂₃₄
+                0x2085, 0x2086, 0x2087, 0x2088, 0x2089    // ₅₆₇₈₉
+            };
+            if (octave < 0) {
+                result.fullName += juce::String::charToString(0x208B);  // ₋ (subscript minus)
+                octave = -octave;
+            }
+            if (octave >= 10)
+                result.fullName += juce::String::charToString(subscriptDigits[octave / 10]);
+            result.fullName += juce::String::charToString(subscriptDigits[octave % 10]);
+        }
         result.matchScore = 1.0f;
         return result;
     }
