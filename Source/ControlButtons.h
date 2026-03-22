@@ -15,6 +15,7 @@ public:
   int getShowIntervals() { return showIntervals; }
   int getShowChord() { return showChord; }
   int getShowKeyboard() { return showKeyboard; }
+  bool getSustainMeasure() { return sustainMeasure; }
   void paint (juce::Graphics& g) override;
   void resized() override;
 
@@ -34,6 +35,7 @@ private:
   juce::ToggleButton showPitchClassesButton;
   juce::ToggleButton showIntervalsButton;
   juce::ToggleButton showChordButton;
+  juce::ToggleButton sustainMeasureButton;
   juce::Slider fontSizeSlider;
   int fontSize;
 
@@ -45,6 +47,7 @@ private:
   int showPitchClasses = 1;
   int showIntervals = 1;
   int showChord = 1;
+  bool sustainMeasure = false;   // Sustain notes to end of measure for display
 
   juce::ComboBox rootKeyComboBox;
   void rootKeyComboBoxChanged();

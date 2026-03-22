@@ -270,6 +270,7 @@ void PluginEditor::paint (juce::Graphics& g)
 void PluginEditor::resized()
 {
   controlButtons.saveToState(audioProcessor.uiState);
+  audioProcessor.sustainMeasure.store(controlButtons.getSustainMeasure());
 
   juce::Grid grid;
   using Track = juce::Grid::TrackInfo;

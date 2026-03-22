@@ -39,6 +39,12 @@ ControlButtons::ControlButtons (juce::Rectangle<int> initialBounds, PluginEditor
   showChordButton.setButtonText (TRANS("C"));
   showChordButton.onClick = [this]() { showChord = 1 - showChord; editor->resized(); DBG("showChord set to " << showChord); };
 
+  sustainMeasureButton.setToggleState (sustainMeasure, juce::dontSendNotification);
+  addAndMakeVisible (&sustainMeasureButton);
+  sustainMeasureButton.setTooltip (TRANS("Sustain notes to end of measure (catches arpeggiated chords)"));
+  sustainMeasureButton.setButtonText("M");
+  sustainMeasureButton.onClick = [this]() { sustainMeasure = !sustainMeasure; editor->resized(); DBG("sustainMeasure set to " << (int)sustainMeasure); };
+
   addAndMakeVisible (rootKeyComboBox);
   rootKeyComboBox.setTooltip (TRANS("Root key assumed for chord spellings when reasonable"));
   rootKeyComboBox.setEditableText (false);
@@ -118,6 +124,7 @@ void ControlButtons::resized()
   fb.items.add ( juce::FlexItem(showIntervalsButton).withMinWidth (20.0f).withMinHeight (20.0f) );
   fb.items.add ( juce::FlexItem(showChordButton).withMinWidth (20.0f).withMinHeight (20.0f) );
   fb.items.add ( juce::FlexItem(showKeyboardButton).withMinWidth (20.0f).withMinHeight (20.0f) );
+  fb.items.add ( juce::FlexItem(sustainMeasureButton).withMinWidth (20.0f).withMinHeight (20.0f) );
   fb.items.add ( juce::FlexItem(fontSizeSlider).withMinWidth (100.0f).withMinHeight (20.0f) );
   fb.performLayout (getLocalBounds().toFloat());
 #endif
@@ -138,6 +145,7 @@ void ControlButtons::saveToState(juce::ValueTree& state)
   state.setProperty("showPitchClasses", showPitchClasses, nullptr);
   state.setProperty("showIntervals",    showIntervals,   nullptr);
   state.setProperty("showChord",        showChord,       nullptr);
+  state.setProperty("sustainMeasure",  sustainMeasure ? 1 : 0, nullptr);
   state.setProperty("rootKey",          rootKeyComboBox.getSelectedId(), nullptr);
 }
 
@@ -162,6 +170,10 @@ void ControlButtons::loadFromState(const juce::ValueTree& state)
   if (state.hasProperty("showChord")) {
     showChord = (int)state["showChord"];
     showChordButton.setToggleState(showChord != 0, juce::dontSendNotification);
+  }
+  if (state.hasProperty("sustainMeasure")) {
+    sustainMeasure = (int)state["sustainMeasure"] != 0;
+    sustainMeasureButton.setToggleState(sustainMeasure, juce::dontSendNotification);
   }
   if (state.hasProperty("rootKey")) {
     int rootId = (int)state["rootKey"];

@@ -68,6 +68,9 @@ public:
     return midiKeyboardState;
   }
 
+  /// When true, note-offs are deferred for display until the next measure boundary.
+  std::atomic<bool> sustainMeasure { false };
+
   /// Persistent UI state — survives DAW save/load
   juce::ValueTree uiState { "MidiToChordsState" };
 
@@ -78,7 +81,10 @@ private:
   std::array<int,128> heldNotes { 0 };
 
   void updateNoteState(int noteNumber, bool noteOn);
+  void clearAllNotes();
   juce::MidiKeyboardState midiKeyboardState;
+
+  int lastBarNumber = -1;
   //==============================================================================
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
 };
