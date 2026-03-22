@@ -161,7 +161,7 @@ void PluginEditor::setRootKey(juce::String key) {
 
 void PluginEditor::reset() {
   const juce::ScopedLock myScopedLock (resetLock);
-  audioProcessor.getMidiKeyboardState().reset();
+  audioProcessor.clearAllNotes();  // clear processor-side note tracking
   pitchClassesPresent.fill(0);
   rotatedPitchClassesPresent.fill(0);
   lowestHeldNote = -1;
@@ -270,7 +270,7 @@ void PluginEditor::paint (juce::Graphics& g)
 void PluginEditor::resized()
 {
   controlButtons.saveToState(audioProcessor.uiState);
-  audioProcessor.sustainMeasure.store(controlButtons.getSustainMeasure());
+  audioProcessor.freezeNotes.store(controlButtons.getFreeze());
 
   juce::Grid grid;
   using Track = juce::Grid::TrackInfo;

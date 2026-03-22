@@ -143,31 +143,13 @@ void PluginProcessor::clearAllNotes()
 
 void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-  // Detect measure boundaries for sustain-measure mode
-  if (sustainMeasure.load()) {
-    if (auto* playHead = getPlayHead()) {
-      auto pos = playHead->getPosition();
-      if (pos.hasValue()) {
-        auto barCount = pos->getBarCount();
-        if (barCount.hasValue()) {
-          int bar = *barCount;
-          if (lastBarNumber >= 0 && bar != lastBarNumber)
-            clearAllNotes();
-          lastBarNumber = bar;
-        }
-      }
-    }
-  } else {
-    lastBarNumber = -1;
-  }
-
   for (const auto meta : midiMessages) {
     auto m = meta.getMessage();
     midiKeyboardState.processNextMidiEvent(m);
     if (m.isNoteOn())
       updateNoteState(m.getNoteNumber(), true);
     else if (m.isNoteOff()) {
-      if (!sustainMeasure.load())
+      if (!freezeNotes.load())
         updateNoteState(m.getNoteNumber(), false);
     }
   }

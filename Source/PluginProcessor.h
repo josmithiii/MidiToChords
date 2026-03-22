@@ -68,8 +68,11 @@ public:
     return midiKeyboardState;
   }
 
-  /// When true, note-offs are deferred for display until the next measure boundary.
-  std::atomic<bool> sustainMeasure { false };
+  /// When true, note-offs are ignored for display — notes accumulate until cleared.
+  std::atomic<bool> freezeNotes { false };
+
+  /// Clear all internal note tracking state (called by editor reset).
+  void clearAllNotes();
 
   /// Persistent UI state — survives DAW save/load
   juce::ValueTree uiState { "MidiToChordsState" };
@@ -81,10 +84,7 @@ private:
   std::array<int,128> heldNotes { 0 };
 
   void updateNoteState(int noteNumber, bool noteOn);
-  void clearAllNotes();
   juce::MidiKeyboardState midiKeyboardState;
-
-  int lastBarNumber = -1;
   //==============================================================================
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
 };
