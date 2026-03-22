@@ -141,18 +141,43 @@ void PluginProcessor::clearAllNotes()
   heldNotes.fill(0);
   pitchClassesPresent.fill(0);
   midiKeyboardState.reset();
+  transportPaused = false;
 }
 
 void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
+  // Detect transport pause — freeze display when DAW stops
+  bool isPlaying = false;
+  if (auto* playHead = getPlayHead()) {
+    auto pos = playHead->getPosition();
+    if (pos.hasValue())
+      isPlaying = pos->getIsPlaying();
+  }
+  if (wasPlaying && !isPlaying)
+    transportPaused = true;   // just paused: suppress upcoming note-offs
+  else if (!wasPlaying && isPlaying) {
+    transportPaused = false;  // playing again: clear frozen display
+    clearAllNotes();
+  }
+  wasPlaying = isPlaying;
+
+  bool suppressNoteOff = freezeNotes.load() || transportPaused;
+
   for (const auto meta : midiMessages) {
     auto m = meta.getMessage();
-    midiKeyboardState.processNextMidiEvent(m);
-    if (m.isNoteOn())
+    if (m.isNoteOn()) {
+      midiKeyboardState.processNextMidiEvent(m);
       updateNoteState(m.getNoteNumber(), true);
-    else if (m.isNoteOff()) {
-      if (!freezeNotes.load())
+    } else if (m.isNoteOff()) {
+      if (!suppressNoteOff) {
+        midiKeyboardState.processNextMidiEvent(m);
         updateNoteState(m.getNoteNumber(), false);
+      }
+    } else {
+      if (suppressNoteOff && m.isController()
+          && (m.getControllerNumber() == 123 || m.getControllerNumber() == 120))
+        continue;
+      midiKeyboardState.processNextMidiEvent(m);
     }
   }
 }

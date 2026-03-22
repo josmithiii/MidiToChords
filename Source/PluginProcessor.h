@@ -88,6 +88,11 @@ private:
 
   void updateNoteState(int noteNumber, bool noteOn);
   juce::MidiKeyboardState midiKeyboardState;
+
+  /// True when the DAW transport was playing in the previous processBlock call.
+  bool wasPlaying { false };
+  /// True after transport stops — suppresses note-offs until transport resumes.
+  bool transportPaused { false };
   //==============================================================================
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
 };
