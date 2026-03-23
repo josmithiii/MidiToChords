@@ -49,6 +49,11 @@ private:
   int showChord = 1;
   bool freeze = false;   // Freeze: ignore note-offs, accumulate notes until unchecked
 
+  juce::Label tooltipLabel;
+  void mouseEnter (const juce::MouseEvent& event) override;
+  void mouseExit (const juce::MouseEvent& event) override;
+  void addTooltipTracking (juce::Component& comp);
+
   juce::ComboBox rootKeyComboBox;
   void rootKeyComboBoxChanged();
 

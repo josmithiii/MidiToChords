@@ -93,6 +93,19 @@ ControlButtons::ControlButtons (juce::Rectangle<int> initialBounds, PluginEditor
     DBG("Font size set to " << fontSize);
   };
 
+  addAndMakeVisible (tooltipLabel);
+  tooltipLabel.setColour (juce::Label::textColourId, juce::Colours::lightgrey);
+  tooltipLabel.setJustificationType (juce::Justification::centredLeft);
+
+  addTooltipTracking (resetButton);
+  addTooltipTracking (rootKeyComboBox);
+  addTooltipTracking (showKeyboardButton);
+  addTooltipTracking (showPitchClassesButton);
+  addTooltipTracking (showIntervalsButton);
+  addTooltipTracking (showChordButton);
+  addTooltipTracking (freezeButton);
+  addTooltipTracking (fontSizeSlider);
+
   setBounds(initialBounds); // triggers resized
 }
 
@@ -128,6 +141,7 @@ void ControlButtons::resized()
   fb.items.add ( juce::FlexItem(showKeyboardButton).withMinWidth (20.0f).withMinHeight (20.0f) );
   fb.items.add ( juce::FlexItem(freezeButton).withMinWidth (20.0f).withMinHeight (20.0f) );
   fb.items.add ( juce::FlexItem(fontSizeSlider).withMinWidth (100.0f).withMinHeight (20.0f) );
+  fb.items.add ( juce::FlexItem(tooltipLabel).withMinWidth (40.0f).withMinHeight (20.0f).withFlex (1.0f) );
   fb.performLayout (getLocalBounds().toFloat());
 #endif
 }
@@ -149,6 +163,27 @@ void ControlButtons::saveToState(juce::ValueTree& state)
   state.setProperty("showChord",        showChord,       nullptr);
   state.setProperty("freeze",  freeze ? 1 : 0, nullptr);
   state.setProperty("rootKey",          rootKeyComboBox.getSelectedId(), nullptr);
+}
+
+void ControlButtons::addTooltipTracking (juce::Component& comp)
+{
+  comp.addMouseListener (this, true);
+}
+
+void ControlButtons::mouseEnter (const juce::MouseEvent& event)
+{
+  if (auto* ttClient = dynamic_cast<juce::TooltipClient*> (event.eventComponent))
+  {
+    auto tip = ttClient->getTooltip();
+    if (tip.isNotEmpty())
+      tooltipLabel.setText (tip, juce::dontSendNotification);
+  }
+}
+
+void ControlButtons::mouseExit (const juce::MouseEvent& event)
+{
+  juce::ignoreUnused (event);
+  tooltipLabel.setText ("", juce::dontSendNotification);
 }
 
 void ControlButtons::loadFromState(const juce::ValueTree& state)

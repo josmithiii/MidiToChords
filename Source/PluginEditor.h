@@ -33,6 +33,7 @@ public:
   void resized() override;
 
 private:
+  juce::TooltipWindow tooltipWindow { this };
   juce::CriticalSection resetLock;
   juce::Rectangle<int> guiBounds;
   juce::Rectangle<int> controlButtonBounds;
