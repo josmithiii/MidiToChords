@@ -68,6 +68,11 @@ public:
     return midiKeyboardState;
   }
 
+  /// Historical note range (min/max MIDI note ever seen since last clear).
+  std::pair<int,int> getNoteRange() {
+    return { minNoteEver.load(), maxNoteEver.load() };
+  }
+
   /// When true, note-offs are ignored for display — notes accumulate until cleared.
   std::atomic<bool> freezeNotes { false };
 
@@ -88,6 +93,8 @@ private:
 
   void updateNoteState(int noteNumber, bool noteOn);
   juce::MidiKeyboardState midiKeyboardState;
+  std::atomic<int> minNoteEver { -1 };
+  std::atomic<int> maxNoteEver { -1 };
 
   /// True when the DAW transport was playing in the previous processBlock call.
   bool wasPlaying { false };

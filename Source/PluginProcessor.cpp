@@ -133,6 +133,15 @@ void PluginProcessor::updateNoteState(int noteNumber, bool noteOn)
   pitchClassesPresent[pc] += inc;
   if (pitchClassesPresent[pc] < 0)
     pitchClassesPresent[pc] = 0;  // clamp: spurious note-offs must not go negative
+
+  if (noteOn) {
+    int curMin = minNoteEver.load();
+    if (curMin < 0 || noteNumber < curMin)
+      minNoteEver.store(noteNumber);
+    int curMax = maxNoteEver.load();
+    if (curMax < 0 || noteNumber > curMax)
+      maxNoteEver.store(noteNumber);
+  }
 }
 
 void PluginProcessor::clearAllNotes()
@@ -142,6 +151,8 @@ void PluginProcessor::clearAllNotes()
   pitchClassesPresent.fill(0);
   midiKeyboardState.reset();
   transportPaused = false;
+  minNoteEver.store(-1);
+  maxNoteEver.store(-1);
 }
 
 void PluginProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)

@@ -13,6 +13,7 @@
 #include "PluginProcessor.h"
 #include "ControlButtons.h"
 #include "ChordRecognizer.h"
+#include "NoteRangeDisplay.h"
 
 typedef std::array<int,12> PitchClasses;
 
@@ -39,6 +40,7 @@ private:
   juce::Rectangle<int> controlButtonBounds;
   ControlButtons controlButtons;
   PluginProcessor& audioProcessor;
+  NoteRangeDisplay noteRangeDisplay;
   juce::MidiKeyboardComponent midiKeyboardComponent;
   juce::String currentIntervalString = "No Intervals";
   juce::String currentChordString = "No Chord";

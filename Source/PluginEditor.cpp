@@ -43,6 +43,7 @@ PluginEditor::PluginEditor (PluginProcessor& p) // xtor
   chordLabel.setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
   addAndMakeVisible(controlButtons);
+  addAndMakeVisible(noteRangeDisplay);
   addAndMakeVisible(chordLabel);
   addAndMakeVisible(intervalsLabel);
   addAndMakeVisible(pitchClassesLabel);
@@ -204,6 +205,9 @@ void PluginEditor::timerCallback()
       updateStrings();
       repaint();
     }
+    // Update note range display (no GeoKeys grid — never red)
+    auto [rLo, rHi] = audioProcessor.getNoteRange();
+    noteRangeDisplay.setRange(rLo, rHi, 0, 127);
     frameCount++;
   } else {
     DBG("Timer callback skipped because we must be resetting");
@@ -299,6 +303,7 @@ void PluginEditor::resized()
   using Fr = juce::Grid::Fr;
   grid.templateColumns = { Track (Fr (1)) };
   grid.templateRows = {   Track (Fr (1))
+                        , Track (juce::Grid::Px (18))
                         , Track (Fr (2 * controlButtons.getShowPitchClasses()))
                         , Track (Fr (2 * controlButtons.getShowIntervals()))
                         , Track (Fr (2 * controlButtons.getShowChord()))
@@ -307,6 +312,7 @@ void PluginEditor::resized()
   updateStrings();
   grid.items = {
       juce::GridItem (controlButtons)
+    , juce::GridItem (noteRangeDisplay)
     , juce::GridItem (pitchClassesLabel)
     , juce::GridItem (intervalsLabel)
     , juce::GridItem (chordLabel)
