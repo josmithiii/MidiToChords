@@ -211,13 +211,19 @@ juce::AudioProcessorEditor* PluginProcessor::createEditor()
 void PluginProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
   auto xml = uiState.createXml();
-  if (xml != nullptr)
-    copyXmlToBinary(*xml, destData);
+  if (xml != nullptr) {
+    auto text = xml->toString();
+    destData.append(text.toRawUTF8(), text.getNumBytesAsUTF8());
+  }
 }
 
 void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-  auto xml = getXmlFromBinary(data, sizeInBytes);
+  // Try plain XML first (new format), then binary-wrapped XML (old format)
+  auto text = juce::String::fromUTF8(static_cast<const char*>(data), sizeInBytes);
+  auto xml = juce::parseXML(text);
+  if (xml == nullptr)
+    xml = getXmlFromBinary(data, sizeInBytes);  // backward compat
   if (xml != nullptr && xml->hasTagName(uiState.getType().toString())) {
     uiState = juce::ValueTree::fromXml(*xml);
     stateRestored.store(true);  // tell editor to re-read
